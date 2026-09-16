@@ -3,3 +3,44 @@ title: "R Notebook"
 output: github_document
 ---
 
+
+```{r}  
+library(dada2); packageVersion("dada2")
+```
+
+
+```{r}
+path <- "/home/rstudio/Dada222/MiSeq_SOP"
+list.files(path)
+```
+
+```{r}
+fnFs <- sort(list.files(path, pattern="_R1_001.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="_R2_001.fastq", full.names = TRUE))
+sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
+plotQualityProfile(fnFs[1:2])
+```
+2 éch successif (que R1). Longueur de nos reads : 7793 et 5869 pairs de bases. profondeur d'éch pour le 1 est 7793. (explication ds le tutorial) 
+ligne verte : moyenne score de qualité a chaque position pr le nb de reads. 36 est la moyenne des Q-score des 7793 pb.
+fastQ : chaq nt est relie a un score de qualité.La ligne commence par un @ (par rapport a un fast A qui commence par >) ensuite defline ...ligne d'après + puis la ligne d'après est un caractère indiquant le score de qualité. Il donne une estimation de la proablaité que cette base la soit fausse/qu'il y est une erreur. Qscore = 30-1/1000 pour que G soit une erreur (bien)
+                            +
+                            ;
+       = 40-1/10000 (très bien)
+       = 20-1/100 (pas descendre sinon pas bien/pas ouf)
+
+```{r}
+plotQualityProfile(fnRs[1:2])
+```
+
+```{r}
+filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
+filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
+names(filtFs) <- sample.names
+names(filtRs) <- sample.names
+```
+```{r}
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(240,160),
+              maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
+              compress=TRUE, multithread=TRUE) 
+head(out)
+```
