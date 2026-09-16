@@ -91,5 +91,49 @@ rownames(track) <- sample.names
 head(track)
 ```
 
-Au début, input de F3D0 : 7793, une fois la filtration on est a 7113, une fois denoised ca diminue encore. Ensuite qd merged = 6540. Puis qd enleve les chimères : 6528.
+#Au début, input de F3D0 : 7793, une fois la filtration on est a 7113, une fois denoised ca diminue encore. Ensuite qd merged = 6540. Puis qd enleve les chimères : 6528.
+
+```{r}
+taxa <- assignTaxonomy(seqtab.nochim, "/home/rstudio/Dada222/silva_nr99_v138.1_train_set.fa.gz", multithread=FALSE)
+taxa.print <- taxa # Removing sequence rownames for display only
+rownames(taxa.print) <- NULL
+head(taxa.print)
+```
+
+```{r}
+unqs.mock <- seqtab.nochim["Mock",]
+unqs.mock <- sort(unqs.mock[unqs.mock>0], decreasing=TRUE) # Drop ASVs absent in the Mock
+cat("DADA2 inferred", length(unqs.mock), "sample sequences present in the Mock community.\n")
+```
+
+```{r}
+mock.ref <- getSequences(file.path(path, "HMP_MOCK.v35.fasta"))
+match.ref <- sum(sapply(names(unqs.mock), function(x) any(grepl(x, mock.ref))))
+cat("Of those,", sum(match.ref), "were exact matches to the expected reference sequences.\n")
+```
+
+```{r}
+
+
+library(Biostrings); packageVersion("Biostrings")
+library(ggplot2); packageVersion("ggplot2")
+
+```
+```{r}
+theme_set(theme_bw())
+samples.out <- rownames(seqtab.nochim)
+subject <- sapply(strsplit(samples.out, "D"), `[`, 1)
+gender <- substr(subject,1,1)
+subject <- substr(subject,2,999)
+day <- as.integer(sapply(strsplit(samples.out, "D"), `[`, 2))
+samdf <- data.frame(Subject=subject, Gender=gender, Day=day)
+samdf$When <- "Early"
+samdf$When[samdf$Day>100] <- "Late"
+rownames(samdf) <- samples.out
+
+ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE),
+               sample_data(samdf),
+               tax_table(taxa))
+ps <- prune_samples(sample_names(ps) != "Mock", ps) # Remove mock sample
+```
 
