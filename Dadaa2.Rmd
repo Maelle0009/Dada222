@@ -113,17 +113,13 @@ cat("Of those,", sum(match.ref), "were exact matches to the expected reference s
 ```
 
 ```{r}
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-## The following initializes the development version of Bioconductor
-BiocManager::install(version = "devel")
-
-BiocManager::install("phyloseq")
-
+install.packages("igraph", type = "source")
+BiocManager::install("phyloseq", update = FALSE)
+library(phyloseq); packageVersion("phyloseq")
+```
+```{r}
 library(Biostrings); packageVersion("Biostrings")
 library(ggplot2); packageVersion("ggplot2")
-
 ```
 
 
