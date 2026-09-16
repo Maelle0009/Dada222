@@ -50,4 +50,18 @@ errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 plotErrors(errF, nominalQ=TRUE)
 ```
+```{r}
+dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
+```
+
+```{r}
+dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
+```
+```{r}
+dadaFs[[1]]
+```
+
+```{r}
+
+```
 
