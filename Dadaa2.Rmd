@@ -49,6 +49,7 @@ head(out)
 errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 plotErrors(errF, nominalQ=TRUE)
+
 ```
 ```{r}
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
@@ -139,5 +140,31 @@ ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE),
                sample_data(samdf),
                tax_table(taxa))
 ps <- prune_samples(sample_names(ps) != "Mock", ps) # Remove mock sample
+
+dna <- Biostrings::DNAStringSet(taxa_names(ps))
+names(dna) <- taxa_names(ps)
+ps <- merge_phyloseq(ps, dna)
+taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
+ps
+
+```
+
+```{r}
+plot_richness(ps, x="Day", measures=c("Shannon", "Simpson"), color="When")
+```
+
+```{r}
+ps.prop <- transform_sample_counts(ps, function(otu) otu/sum(otu))
+ord.nmds.bray <- ordinate(ps.prop, method="NMDS", distance="bray")
+```
+```{r}
+plot_ordination(ps.prop, ord.nmds.bray, color="When", title="Bray NMDS")
+```
+
+```{r}
+top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+ps.top20 <- prune_taxa(top20, ps.top20)
+plot_bar(ps.top20, x="Day", fill="Family") + facet_wrap(~When, scales="free_x")
 ```
 
