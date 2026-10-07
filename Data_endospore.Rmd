@@ -1,0 +1,20 @@
+---
+title: "R Notebook"
+output: github_document
+---
+
+```{r}
+path <- "/home/rstudio/Dada222/Data"
+list.files(path)
+```
+
+```{r}
+fnFs <- sort(list.files(path, pattern="_1.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="_2.fastq", full.names = TRUE))
+
+sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
+
+
+```
+
+
