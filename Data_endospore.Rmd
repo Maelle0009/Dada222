@@ -47,11 +47,16 @@ head(out)
 
 
 ```{r}
-errF <- learnErrors(filtFs, multithread=TRUE)
+errF <- learnErrors(filtFs, multithread=TRUE), nbases = 10000)#On essaye avec ca car beug'
 errR <- learnErrors(filtRs, multithread=TRUE)
+
 plotErrors(errF, nominalQ=TRUE)
 ```
 
+```{r}
+dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
+
+```
 
 
 
